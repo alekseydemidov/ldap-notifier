@@ -1,0 +1,54 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ldap-notifier
+data:
+      NOTIFIER_LDAP_HOST: localhost
+      NOTIFIER_LDAP_PORT: '389'
+      NOTIFIER_LDAP_TLS: 'False'
+      NOTIFIER_LDAP_BASE: ou=people,dc=example,dc=com
+      NOTIFIER_LDAP_DN_POLICY: cn=default,ou=pwpolicies,dc=example,dc=com
+      NOTIFIER_INTERVAL_CHECK: '60'
+      NOTIFIER_ALERT_TIME: '13:00'
+      NOTIFIER_WRONG_COUNT: '3'
+      NOTIFIER_MAIL_SUBJECT: Example LTD
+      NOTIFIER_MAIL_SENDER: ldap@mail.com
+      NOTIFIER_MAIL_SMTP_SERVER: smtp.mail.com
+      NOTIFIER_MAIL_SMTP_PORT: '25'
+      NOTIFIER_DEBUG: 'True'
+
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ldap-notifier
+stringData:
+      NOTIFIER_LDAP_USER_DN: cn=reader,ou=people,dc=example,dc=com
+      NOTIFIER_LDAP_PASSWORD: secretreader
+      NOTIFIER_MAIL_PASSWORD: ldapmailpassword
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ldap-notifier
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ldap-notifier
+  template:
+    metadata:
+      labels:
+        app: ldap-notifier
+    spec:
+      containers:
+      - name: ldap-notifier
+        image: netflyer/ldap-notifier:latest
+        envFrom:
+        - configMapRef:
+            name: ldap-notifier
+        - secretRef:
+            name: ldap-notifier
