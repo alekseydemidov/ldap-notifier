@@ -47,7 +47,8 @@ NOTIFIER_ALERT_TIME='08:00' [ 24h format ]
 NOTIFIER_WRONG_COUNT='3' [ integer ] 
 NOTIFIER_MAIL_SUBJECT='Example Corporation' [ Any text will be added as begin subject name]
 #NOTIFIER_MAIL_BODY='Hard coded for now.' [ You can change that in code directly ]
-NOTIFIER_MAIL_SENDER='ldap@example.com' [ Required ]
+NOTIFIER_MAIL_FROM='LDAP admin<ldap@example.com>'
+NOTIFIER_MAIL_LOGIN='ldap@example.com' [ Required ]
 NOTIFIER_MAIL_PASSWORD="secretmail" [ Required ]
 NOTIFIER_MAIL_SMTP_SERVER="smtp.example.com" [ Required ]
 NOTIFIER_MAIL_SMTP_PORT=465
@@ -104,8 +105,10 @@ optional arguments:
                         how many wrong password attempts for notification, env(NOTIFIER_WRONG_COUNT). default 3
   --mail_subject MAIL_SUBJECT
                         Subject email, env(NOTIFIER_MAIL_SUBJECT)
-  --mail_sender MAIL_SENDER
-                        Account for email sending, env(NOTIFIER_MAIL_SENDER). Required!!!
+  --mail_from MAIL_FROM
+                        Will be insert to field From, env(NOTIFIER_MAIL_FROM), default = mail_login
+  --mail_login MAIL_LOGIN
+                        Account for email sending, env(NOTIFIER_MAIL_LOGIN). Required!!!
   --mail_pass MAIL_PASS
                         Password for email sending, env(NOTIFIER_MAIL_PASSWORD). Required!!!
   --mail_smtp_server MAIL_SMTP_SERVER

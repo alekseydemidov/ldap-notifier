@@ -44,7 +44,7 @@ DOCUMENTATION = '''
         export NOTIFIER_WRONG_COUNT='3'
         export NOTIFIER_MAIL_SUBJECT='Example LTD'
         #export NOTIFIER_MAIL_BODY='Hard coded for now.' You can change that in code
-        export NOTIFIER_MAIL_SENDER='ldap@mail.com'
+        export NOTIFIER_MAIL_LOGIN='ldap@mail.com'
         export NOTIFIER_MAIL_PASSWORD="ldapmailpassword"
         export NOTIFIER_MAIL_SMTP_SERVER="smtp.mail.com"
         export NOTIFIER_MAIL_SMTP_PORT=25
@@ -67,7 +67,8 @@ def parse_args():
     alert_time = environ['NOTIFIER_ALERT_TIME'] if environ.get('NOTIFIER_ALERT_TIME') else '08:00'
     wrong_count = environ['NOTIFIER_WRONG_COUNT'] if environ.get('NOTIFIER_WRONG_COUNT') else 3
     mail_subject = environ['NOTIFIER_MAIL_SUBJECT'] if environ.get('NOTIFIER_MAIL_SUBJECT') else 'Alert'
-    mail_sender = environ['NOTIFIER_MAIL_SENDER'] if environ.get('NOTIFIER_MAIL_SENDER') else False
+    mail_login = environ['NOTIFIER_MAIL_LOGIN'] if environ.get('NOTIFIER_MAIL_LOGIN') else False
+    mail_from = environ['NOTIFIER_MAIL_FROM'] if environ.get('NOTIFIER_MAIL_FROM') else mail_login
     mail_pass = environ['NOTIFIER_MAIL_PASSWORD'] if environ.get('NOTIFIER_MAIL_PASSWORD') else False
     mail_smtp_server = environ['NOTIFIER_MAIL_SMTP_SERVER'] if environ.get('NOTIFIER_MAIL_SMTP_SERVER') else False
     mail_smtp_port = environ['NOTIFIER_MAIL_SMTP_PORT'] if environ.get('NOTIFIER_MAIL_SMTP_PORT') else '25'
@@ -86,7 +87,8 @@ def parse_args():
     parser.add_argument('--alert_time', default = alert_time, help='Preferred time to send alerts in 24hours format (HH:MM) e.g. 14:00, env(NOTIFIER_ALERT_TIME), default 08:00')
     parser.add_argument('--wrong_count', type=int, default = wrong_count, help='how many wrong password attempts for notification, env(NOTIFIER_WRONG_COUNT). default 3')
     parser.add_argument('--mail_subject', default = mail_subject, help='Subject email, env(NOTIFIER_MAIL_SUBJECT)')
-    parser.add_argument('--mail_sender', default = mail_sender, help='Account for email sending, env(NOTIFIER_MAIL_SENDER). Required!!!')
+    parser.add_argument('--mail_from', default = mail_from, help='Will be insert to field From, env(NOTIFIER_MAIL_FROM), default = mail_login')
+    parser.add_argument('--mail_login', default = mail_login, help='Account for email sending, env(NOTIFIER_MAIL_LOGIN). Required!!!')
     parser.add_argument('--mail_pass', default = mail_pass, help='Password for email sending, env(NOTIFIER_MAIL_PASSWORD). Required!!!')
     parser.add_argument('--mail_smtp_server', default = mail_smtp_server, help='SMTP server, env(NOTIFIER_MAIL_SMTP_SERVER). Required!!!')
     parser.add_argument('--mail_smtp_port', default = mail_smtp_port, help='SMTP port, env(NOTIFIER_MAIL_SMTP_PORT), default 25')
@@ -94,7 +96,7 @@ def parse_args():
     args = parser.parse_args()
 
     # Check that necessary arguments is setted up
-    required = {"ldap_user":args.ldap_user, "ldap_pass":args.ldap_pass, "ldap_base":args.ldap_base, "ldap_dn_policy":args.ldap_dn_policy, "mail_sender":args.mail_sender, "mail_pass":args.mail_pass, "mail_smtp_server":args.mail_smtp_server}
+    required = {"ldap_user":args.ldap_user, "ldap_pass":args.ldap_pass, "ldap_base":args.ldap_base, "ldap_dn_policy":args.ldap_dn_policy, "mail_login":args.mail_login, "mail_pass":args.mail_pass, "mail_smtp_server":args.mail_smtp_server}
     for key in required:
         if not required[key]:
             print ("Necessary argument "+key+" is missing, please run application with argument --help")
@@ -112,9 +114,9 @@ def parse_args():
         exit (1)
     return args
 
-def email_send(sender_email,sender_pass,receiver_email,subject,email_body,smtp_server,smtp_port):
+def email_send(sender_email,from_email,sender_pass,receiver_email,subject,email_body,smtp_server,smtp_port):
     message = MIMEMultipart()
-    message["From"] = sender_email
+    message["From"] = from_email
     message["To"] = receiver_email
     message["Subject"] = subject
     message["Bcc"] = receiver_email  # Recommended for mass emails
@@ -198,8 +200,8 @@ def main():
                 if check_locked(object,args.interval_check): 
                     print ("Account "+object[0]+" has been locked")
                     mail_subject = args.mail_subject+" LDAP account has been locked"
-                    email_body="Hello,\nYour LDAP account has been locked due to "+str(pwd_max_failure)+"unsuccessful login.\nAccount will be unlocked in "+str(pwd_lockout_duration)
-                    email_send(args.mail_sender,args.mail_pass,email_receiver,mail_subject,email_body,args.mail_smtp_server,args.mail_smtp_port)
+                    email_body="Hello,\nYour LDAP account has been locked due to "+str(pwd_max_failure)+" unsuccessful login.\nAccount will be unlocked in "+str(pwd_lockout_duration+" hrs")
+                    email_send(args.mail_login,args.mail_from,args.mail_pass,email_receiver,mail_subject,email_body,args.mail_smtp_server,args.mail_smtp_port)
 
                 #Check failed login attempts
                 res = check_failed_login(object,args.wrong_count,args.interval_check)
@@ -209,7 +211,7 @@ def main():
                         print ("It will be locked after "+str(pwd_max_failure-res)+" attempts")
                         mail_subject = args.mail_subject+" LDAP account login failed"
                         email_body="Hello,\nYou have failed login attempts: "+str(res)+"\nAccount will be locked after "+str(pwd_max_failure-res)+" unsuccessful attempts"
-                        email_send(args.mail_sender,args.mail_pass,email_receiver,mail_subject,email_body,args.mail_smtp_server,args.mail_smtp_port)
+                        email_send(args.mail_login,args.mail_from,args.mail_pass,email_receiver,mail_subject,email_body,args.mail_smtp_server,args.mail_smtp_port)
 
                 #Check password expiration only once day about alert_time
                 if abs(datetime.now()-args.alert_time) < args.interval_check:
@@ -223,7 +225,7 @@ def main():
                             print ("Account "+object[0]+" will be expired in: "+str(pwd_max_age-res))
                             mail_subject = args.mail_subject+" LDAP account will be expired soon"
                             email_body = "Hello,\nYour LDAP account will be expired in "+str(pwd_max_age-res)+"\nPlease change you password as soon as possible"
-                        email_send(args.mail_sender,args.mail_pass,email_receiver,mail_subject,email_body,args.mail_smtp_server,args.mail_smtp_port)
+                        email_send(args.mail_login,args.mail_from,args.mail_pass,email_receiver,mail_subject,email_body,args.mail_smtp_server,args.mail_smtp_port)
 
         time.sleep (args.interval_check.seconds)
 
