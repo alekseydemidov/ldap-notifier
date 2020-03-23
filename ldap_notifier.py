@@ -124,8 +124,8 @@ def email_send(sender_email,sender_pass,receiver_email,subject,email_body,smtp_s
     # Log in to server using secure context and send email
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(smtp_server, smtp_port, context=context) as server:
-        server.login(sender_email, sender_pass)
         try:
+            server.login(sender_email, sender_pass)
             server.sendmail(sender_email, receiver_email.split(','), text)
         except Exception as e:
             print (e)
