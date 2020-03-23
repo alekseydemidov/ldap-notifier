@@ -6,4 +6,4 @@ RUN apk update && \
     pip3 install python-ldap
 COPY ldap_notifier.py /opt
 RUN chmod +x /opt/ldap_notifier.py
-ENTRYPOINT ["/opt/ldap_notifier.py"] 
+ENTRYPOINT ["/bin/bash", "-c", "/opt/ldap_notifier.py"] 
