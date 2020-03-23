@@ -200,7 +200,7 @@ def main():
                 if check_locked(object,args.interval_check): 
                     print ("Account "+object[0]+" has been locked")
                     mail_subject = args.mail_subject+" LDAP account has been locked"
-                    email_body="Hello,\nYour LDAP account has been locked due to "+str(pwd_max_failure)+" unsuccessful login.\nAccount will be unlocked in "+str(pwd_lockout_duration+" hrs")
+                    email_body="Hello,\nYour LDAP account has been locked due to "+str(pwd_max_failure)+" unsuccessful login.\nAccount will be unlocked in "+str(pwd_lockout_duration)+" hrs"
                     email_send(args.mail_login,args.mail_from,args.mail_pass,email_receiver,mail_subject,email_body,args.mail_smtp_server,args.mail_smtp_port)
 
                 #Check failed login attempts

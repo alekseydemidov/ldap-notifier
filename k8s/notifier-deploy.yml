@@ -13,6 +13,7 @@ data:
       NOTIFIER_ALERT_TIME: '13:00'
       NOTIFIER_WRONG_COUNT: '3'
       NOTIFIER_MAIL_SUBJECT: Example LTD
+      NOTIFIER_MAIL_FROM: LDAP admin<ldap@mail.com>
       NOTIFIER_MAIL_SENDER: ldap@mail.com
       NOTIFIER_MAIL_SMTP_SERVER: smtp.mail.com
       NOTIFIER_MAIL_SMTP_PORT: '25'
