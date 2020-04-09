@@ -144,7 +144,9 @@ def check_expiration(object,pwd_max_age,pwd_expiring_warn):
     debug("Check expiration: "+object[0])
     if "pwdChangedTime" in object[1]: passwd_time = datetime.strptime(object[1]["pwdChangedTime"][0].decode("utf-8"),'%Y%m%d%H%M%SZ')
     else: passwd_time = datetime.strptime(object[1]["createTimestamp"][0].decode("utf-8"),'%Y%m%d%H%M%SZ')
+    # Below you can change how many days after expiration, the notifications should be sent, default <=3
     if (datetime.now()-passwd_time) >= pwd_max_age-pwd_expiring_warn and (datetime.now()-passwd_time).days <= 3:
+        debug ("Expired == True")
         return (datetime.now()-passwd_time)
     return False
 
@@ -187,7 +189,7 @@ def main():
                 break
             except Exception as e:
                 print (e)
-                print ("Waiting for 15 sec"); time.sleep(15);
+                print ("Waiting for 15 sec"); time.sleep(15)
                 if i == 4: print ("5 attempts LDAP search ppolicy were unsuccessful, exiting..."); exit (3)
         #Search object in LDAP
         for i in range(5):
@@ -197,7 +199,7 @@ def main():
                 break
             except Exception as e:
                 print (e)
-                print ("Waiting for 15 sec"); time.sleep(15);
+                print ("Waiting for 15 sec"); time.sleep(15)
                 if i == 4: print ("5 attempts LDAP search objects were unsuccessful, exiting..."); exit (3)
         
         for object in results:

@@ -2,7 +2,7 @@
 
 LDAP password notification service.  
 This script uses ppolicies objects and attributes to notify user through email about:  
-- password expiration [ Notification will be sent once per day next checking after --alert_time ] 
+- password expiration [ Notification will be sent once per day next checking after --alert_time. Also this notification will be sent 3 days after expiration /this point is hardcoded and can be changed in code, look fot a comments/ ] 
 - exceeded wrong login attempts  [ Notification will be sent if failed login attempts more --wrong_count ]
 - account locked [ Notification will be sent if LDAP account locked due to exeeding pwdMaxFailure ]
 
