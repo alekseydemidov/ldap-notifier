@@ -175,7 +175,7 @@ def main():
     while True:
         print ("Checking time: "+str(datetime.now()))
         # Search ppolicy in LDAP
-        for i in range(4):
+        for i in range(5):
             try:
                 ppolicy = con.search_s(args.ldap_dn_policy, ldap.SCOPE_SUBTREE, "objectclass=*", ['pwdExpireWarning', 'pwdMaxAge', 'pwdLockoutDuration', 'pwdMaxFailure'])
                 debug ("Founded ppolicy:"); debug (ppolicy) #ppolicy[0][1]
@@ -187,15 +187,17 @@ def main():
                 break
             except Exception as e:
                 print (e)
+                print ("Waiting for 15 sec"); time.sleep(15);
                 if i == 4: print ("5 attempts LDAP search ppolicy were unsuccessful, exiting..."); exit (3)
         #Search object in LDAP
-        for i in range(4):
+        for i in range(5):
             try:
                 results = con.search_s(args.ldap_base, ldap.SCOPE_SUBTREE, args.ldap_filter,['*','+'])
                 debug ("Founded objects:"); debug (results)
                 break
             except Exception as e:
                 print (e)
+                print ("Waiting for 15 sec"); time.sleep(15);
                 if i == 4: print ("5 attempts LDAP search objects were unsuccessful, exiting..."); exit (3)
         
         for object in results:
