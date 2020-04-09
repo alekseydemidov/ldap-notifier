@@ -144,7 +144,7 @@ def check_expiration(object,pwd_max_age,pwd_expiring_warn):
     debug("Check expiration: "+object[0])
     if "pwdChangedTime" in object[1]: passwd_time = datetime.strptime(object[1]["pwdChangedTime"][0].decode("utf-8"),'%Y%m%d%H%M%SZ')
     else: passwd_time = datetime.strptime(object[1]["createTimestamp"][0].decode("utf-8"),'%Y%m%d%H%M%SZ')
-    if (datetime.now()-passwd_time) >= pwd_max_age-pwd_expiring_warn:
+    if (datetime.now()-passwd_time) >= pwd_max_age-pwd_expiring_warn and (datetime.now()-passwd_time).days <= 3:
         return (datetime.now()-passwd_time)
     return False
 
