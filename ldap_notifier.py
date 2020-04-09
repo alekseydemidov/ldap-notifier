@@ -175,22 +175,28 @@ def main():
     while True:
         print ("Checking time: "+str(datetime.now()))
         # Search ppolicy in LDAP
-        try:
-            ppolicy = con.search_s(args.ldap_dn_policy, ldap.SCOPE_SUBTREE, "objectclass=*", ['pwdExpireWarning', 'pwdMaxAge', 'pwdLockoutDuration', 'pwdMaxFailure'])
-            debug ("Founded ppolicy:"); debug (ppolicy) #ppolicy[0][1]
-            pwd_max_age=timedelta(seconds=int(ppolicy[0][1]["pwdMaxAge"][0].decode("utf-8")))
-            pwd_expiring_warn=timedelta(seconds=int(ppolicy[0][1]["pwdExpireWarning"][0].decode("utf-8")))
-            pwd_lockout_duration=timedelta(seconds=int(ppolicy[0][1]["pwdLockoutDuration"][0].decode("utf-8")))
-            pwd_max_failure=int(ppolicy[0][1]["pwdMaxFailure"][0].decode("utf-8"))
-            debug ("pwd_max_age = "+str(pwd_max_age)+"| pwd_expiring_warn = "+str(pwd_expiring_warn)+"| pwd_lockout_duration = "+str(pwd_lockout_duration))
-        except Exception as e:
-            print (e) ; exit (3)
+        for i in range(4):
+            try:
+                ppolicy = con.search_s(args.ldap_dn_policy, ldap.SCOPE_SUBTREE, "objectclass=*", ['pwdExpireWarning', 'pwdMaxAge', 'pwdLockoutDuration', 'pwdMaxFailure'])
+                debug ("Founded ppolicy:"); debug (ppolicy) #ppolicy[0][1]
+                pwd_max_age=timedelta(seconds=int(ppolicy[0][1]["pwdMaxAge"][0].decode("utf-8")))
+                pwd_expiring_warn=timedelta(seconds=int(ppolicy[0][1]["pwdExpireWarning"][0].decode("utf-8")))
+                pwd_lockout_duration=timedelta(seconds=int(ppolicy[0][1]["pwdLockoutDuration"][0].decode("utf-8")))
+                pwd_max_failure=int(ppolicy[0][1]["pwdMaxFailure"][0].decode("utf-8"))
+                debug ("pwd_max_age = "+str(pwd_max_age)+"| pwd_expiring_warn = "+str(pwd_expiring_warn)+"| pwd_lockout_duration = "+str(pwd_lockout_duration))
+                break
+            except Exception as e:
+                print (e)
+                if i == 4: print ("5 attempts LDAP search ppolicy were unsuccessful, exiting..."); exit (3)
         #Search object in LDAP
-        try:
-            results = con.search_s(args.ldap_base, ldap.SCOPE_SUBTREE, args.ldap_filter,['*','+'])
-            debug ("Founded objects:"); debug (results)
-        except Exception as e:
-            print (e) ; exit (3)
+        for i in range(4):
+            try:
+                results = con.search_s(args.ldap_base, ldap.SCOPE_SUBTREE, args.ldap_filter,['*','+'])
+                debug ("Founded objects:"); debug (results)
+                break
+            except Exception as e:
+                print (e)
+                if i == 4: print ("5 attempts LDAP search objects were unsuccessful, exiting..."); exit (3)
         
         for object in results:
             if 'mail' in object[1]: # Only check object with 'mail' attrubute
