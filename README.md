@@ -55,9 +55,10 @@ NOTIFIER_MAIL_SMTP_PORT=465
 NOTIFIER_DEBUG='True'
 ```
 
-Hyperlink to [dockerhub images](https://hub.docker.com/r/netflyer/ldap-notifier)  
-Hyperlink to [openldap github repo](https://github.com/alekseydemidov/openldap-docker)  
-Hyperlink to [openldap_images](https://hub.docker.com/r/netflyer/openldap)  
+## Links to related resources
+[LDAP notifier images](https://hub.docker.com/r/netflyer/ldap-notifier)  
+[OpenLDAP images](https://hub.docker.com/r/netflyer/openldap)  
+[OpenLDAP-GUI images](https://hub.docker.com/r/netflyer/openldap-ui) 
 
 ## Standalone usage
 This script can be used like a standalone service, you can run that like a system.d service for example
