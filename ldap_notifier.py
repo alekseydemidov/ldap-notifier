@@ -210,7 +210,7 @@ def main():
                 if check_locked(object,args.interval_check): 
                     print ("Account "+object[0]+" has been locked")
                     mail_subject = args.mail_subject+" LDAP account has been locked"
-                    email_body="Hello,\nYour LDAP account has been locked due to "+str(pwd_max_failure)+" unsuccessful login.\nAccount will be unlocked in "+str(pwd_lockout_duration)+" hrs"
+                    email_body="Hello,\n\nYour LDAP account has been locked due to "+str(pwd_max_failure)+" unsuccessful login.\n\nAccount will be unlocked in "+str(pwd_lockout_duration)+" hrs"
                     email_send(args.mail_login,args.mail_from,args.mail_pass,email_receiver,mail_subject,email_body,args.mail_smtp_server,args.mail_smtp_port)
 
                 #Check failed login attempts
@@ -220,7 +220,7 @@ def main():
                         print ("Account "+object[0]+" have failed login attempts: "+str(res))
                         print ("It will be locked after "+str(pwd_max_failure-res)+" attempts")
                         mail_subject = args.mail_subject+" LDAP account login failed"
-                        email_body="Hello,\nYou have failed login attempts: "+str(res)+"\nAccount will be locked after "+str(pwd_max_failure-res)+" unsuccessful attempts"
+                        email_body="Hello,\n\nYou have failed login attempts: "+str(res)+"\n\nAccount will be locked after "+str(pwd_max_failure-res)+" unsuccessful attempts"
                         email_send(args.mail_login,args.mail_from,args.mail_pass,email_receiver,mail_subject,email_body,args.mail_smtp_server,args.mail_smtp_port)
 
                 #Check password expiration only once day about alert_time
@@ -230,7 +230,7 @@ def main():
                         if res > pwd_max_age:
                             print ("Account "+object[0]+" is exipired "+str(res-pwd_max_age)+" ago")
                             mail_subject = args.mail_subject+" LDAP account is disabled"
-                            email_body="Hello,\nYour LDAP account has been expired" +str(res-pwd_max_age)+" ago\nPlease contact to LDAP administrator to reset password"
+                            email_body="Hello,\n\nYour LDAP account has been expired: " +str(res-pwd_max_age)+" ago\n\nPlease contact to LDAP administrator to reset password"
                         else:
                             print ("Account "+object[0]+" will be expired in: "+str(pwd_max_age-res))
                             mail_subject = args.mail_subject+" LDAP account will be expired soon"
